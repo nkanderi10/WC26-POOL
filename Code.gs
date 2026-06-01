@@ -1,15 +1,3 @@
-// ============================================================
-//  Office World Cup 2026 Prediction Pool — Code.gs
-//  Google Apps Script Backend
-//
-//  SETUP STEPS (see deployment guide):
-//  1. Create a Google Sheet with two sheets named:
-//     "Predictions" and "Scores"
-//  2. Paste this code into Apps Script (Extensions > Apps Script)
-//  3. Deploy as Web App (Execute as: Me, Access: Anyone)
-//  4. Copy the Web App URL into script.js → APPS_SCRIPT_URL
-// ============================================================
-
 const ADMIN_PASSWORD = 'worldcup2026admin'; // CHANGE THIS — must match script.js
 const TOTAL_MATCHES  = 72;
 
