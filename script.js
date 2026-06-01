@@ -1,10 +1,3 @@
-/* ============================================================
-   Office World Cup 2026 Prediction Pool — script.js
-   ============================================================
-   SETUP: Replace APPS_SCRIPT_URL below with your deployed
-   Google Apps Script Web App URL.
-   ============================================================ */
-
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXi66h0kUhKgiHQzxYiJg2xupDpJk1y8a-7BqB71hVw6f24NfYpJrwE48VoRgQSxLY/exec';
 const ADMIN_PASSWORD  = 'worldcup2026admin'; // change this
 
