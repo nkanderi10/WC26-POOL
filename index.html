@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Office World Cup 2026 Prediction Pool</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     NAVBAR
+═══════════════════════════════════════════════════════ -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <span class="ball">⚽</span>
+    <span>WC 2026 Pool</span>
+  </div>
+  <ul class="navbar-links">
+    <li><button data-page="landing"      onclick="navigate('landing')">🏠 Home</button></li>
+    <li><button data-page="predictions"  onclick="navigate('predictions')">📋 Predict</button></li>
+    <li><button data-page="leaderboard"  onclick="navigate('leaderboard')">🏆 Board</button></li>
+    <li><button data-page="admin"        onclick="navigate('admin')">⚙️ Admin</button></li>
+  </ul>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE: LANDING
+═══════════════════════════════════════════════════════ -->
+<div id="page-landing" class="page">
+
+  <div class="hero">
+    <div class="hero-badge">🌍 USA · Canada · Mexico 2026</div>
+    <h1>Office World Cup<br><span>2026 Prediction Pool</span></h1>
+    <p>Predict scores for all 48 group-stage matches and compete with your colleagues for ultimate football glory!</p>
+  </div>
+
+  <div class="landing-form">
+    <h2>⚽ Enter Your Details</h2>
+
+    <div class="form-group">
+      <label for="input-name">Your Name *</label>
+      <input type="text" id="input-name" placeholder="e.g. Ahmed Al-Rashidi"
+             autocomplete="name" spellcheck="false"
+             onkeydown="if(event.key==='Enter') startPredictions()" />
+    </div>
+
+    <div class="form-group">
+      <label for="input-dept">Department / Team <span style="color:var(--gray-400);font-weight:400">(optional)</span></label>
+      <input type="text" id="input-dept" placeholder="e.g. Finance, IT, Sales…"
+             onkeydown="if(event.key==='Enter') startPredictions()" />
+    </div>
+
+    <button class="btn btn-primary btn-block" onclick="startPredictions()" style="margin-top:0.5rem">
+      Start Predictions →
+    </button>
+
+    <div style="margin-top:1.25rem">
+      <p style="font-size:0.82rem;color:var(--gray-400);text-align:center">
+        Already submitted? Enter the same name to load &amp; update your predictions.
+      </p>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div style="max-width:600px;margin:0 auto;padding:0 1rem 2rem">
+
+    <h2 style="font-size:1.1rem;font-weight:700;color:var(--green-dark);margin-bottom:0.75rem">
+      How to Play
+    </h2>
+
+    <div class="instructions">
+      <ul>
+        <li>Predict the exact scoreline for any World Cup group-stage match.</li>
+        <li>You can skip matches — skipped matches score 0 points.</li>
+        <li>Submit before the match kicks off. Matches are locked at kickoff.</li>
+        <li>Check the leaderboard live as results come in.</li>
+      </ul>
+    </div>
+
+    <h2 style="font-size:1rem;font-weight:700;color:var(--green-dark);margin-bottom:0.75rem">
+      Scoring System
+    </h2>
+
+    <div class="scoring-key">
+      <div class="score-badge">
+        <span class="pts gold">5 pts</span>
+        🎯 Exact score
+      </div>
+      <div class="score-badge">
+        <span class="pts">3 pts</span>
+        ✅ Correct result
+      </div>
+      <div class="score-badge">
+        <span class="pts">+1 pt</span>
+        📐 Correct goal difference
+      </div>
+      <div class="score-badge">
+        <span class="pts gray">0 pts</span>
+        ❌ Wrong outcome
+      </div>
+    </div>
+
+    <div style="font-size:0.82rem;color:var(--gray-600);background:var(--gray-100);border-radius:8px;padding:0.9rem 1rem;margin-top:0.5rem">
+      <strong>Examples:</strong><br>
+      Predicted <strong>2–1</strong>, Actual <strong>2–1</strong> → <strong style="color:var(--gold)">5 pts</strong> (exact!)<br>
+      Predicted <strong>2–1</strong>, Actual <strong>1–0</strong> → <strong style="color:var(--green)">3 pts</strong> (correct result, diff = 1 in both)<br>
+      Predicted <strong>2–0</strong>, Actual <strong>3–1</strong> → <strong style="color:var(--green)">3+1 = 4 pts</strong> (result + goal diff bonus)<br>
+      Predicted <strong>1–2</strong>, Actual <strong>2–0</strong> → <strong>0 pts</strong> (wrong outcome)
+    </div>
+  </div>
+
+</div><!-- /page-landing -->
+
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE: PREDICTIONS
+═══════════════════════════════════════════════════════ -->
+<div id="page-predictions" class="page">
+  <div class="predictions-container">
+
+    <div class="predictions-header">
+      <div>
+        <div id="user-greeting" class="user-greeting">Your Predictions</div>
+        <div style="font-size:0.8rem;color:var(--gray-600);margin-top:0.2rem">
+          All times shown in <strong>Kuwait Time (KWT)</strong> · + = next calendar day
+        </div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="navigate('landing')">← Back</button>
+    </div>
+
+    <!-- Success banner -->
+    <div class="success-banner" id="success-banner">
+      <h3>🎉 Predictions Saved!</h3>
+      <p>Your predictions have been recorded. Good luck!</p>
+      <button class="btn btn-gold" style="margin-top:0.75rem" onclick="navigate('leaderboard')">
+        View Leaderboard →
+      </button>
+    </div>
+
+    <!-- Matches -->
+    <div id="matches-container"></div>
+
+  </div>
+
+  <!-- Floating submit bar -->
+  <div class="submit-bar">
+    <span id="filled-count" class="filled-count">Predictions filled: <strong>0</strong> / 72</span>
+    <button class="btn btn-gold" id="submit-btn" onclick="submitPredictions()">
+      💾 Save / Submit Predictions
+    </button>
+  </div>
+
+</div><!-- /page-predictions -->
+
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE: LEADERBOARD
+═══════════════════════════════════════════════════════ -->
+<div id="page-leaderboard" class="page">
+  <div class="leaderboard-container">
+
+    <div class="leaderboard-header">
+      <div class="leaderboard-title">🏆 Leaderboard</div>
+      <button class="btn btn-outline btn-sm" onclick="loadLeaderboard()">🔄 Refresh</button>
+    </div>
+
+    <div class="leaderboard-table-wrap">
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th style="width:52px">#</th>
+            <th>Name</th>
+            <th>Dept</th>
+            <th class="center">Points</th>
+            <th class="center">Exact</th>
+            <th class="center">Correct</th>
+            <th class="center">GD+</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-tbody">
+          <tr>
+            <td colspan="7" style="text-align:center;padding:2rem;color:var(--gray-400)">
+              Loading…
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="no-entries" class="no-entries" style="display:none">
+      <p>🏟️</p>
+      <p style="font-size:1rem;color:var(--gray-600)">No predictions yet. Be the first!</p>
+    </div>
+
+    <!-- Tiebreaker note -->
+    <div style="margin-top:1.25rem;font-size:0.78rem;color:var(--gray-400);text-align:center">
+      Tiebreakers: Total pts → Exact scores → Correct outcomes → Earliest submission
+    </div>
+
+    <!-- Column legend -->
+    <div style="margin-top:0.75rem;font-size:0.78rem;color:var(--gray-400);text-align:center">
+      <strong>Points</strong> = Total · <strong>Exact</strong> = Exact scorelines · <strong>Correct</strong> = Right outcome · <strong>GD+</strong> = Goal difference bonuses
+    </div>
+
+  </div>
+</div><!-- /page-leaderboard -->
+
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE: ADMIN
+═══════════════════════════════════════════════════════ -->
+<div id="page-admin" class="page">
+  <div class="admin-container">
+
+    <!-- Login form -->
+    <div id="admin-login-form">
+      <div class="admin-login card">
+        <div class="admin-badge">🔐 Admin Access</div>
+        <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem">Enter Admin Password</h2>
+        <div class="form-group">
+          <label for="admin-password">Password</label>
+          <input type="password" id="admin-password" placeholder="Admin password"
+                 onkeydown="if(event.key==='Enter') adminLogin()" />
+        </div>
+        <button class="btn btn-primary btn-block" onclick="adminLogin()">Login →</button>
+        <p style="margin-top:0.75rem;font-size:0.78rem;color:var(--gray-400);text-align:center">
+          Default password set in <code>script.js</code> → <code>ADMIN_PASSWORD</code>
+        </p>
+      </div>
+    </div>
+
+    <!-- Admin panel (hidden until login) -->
+    <div id="admin-panel" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.25rem">
+        <div>
+          <div class="admin-badge">⚙️ Admin Panel</div>
+          <h2 style="font-size:1.3rem;font-weight:800;color:var(--green-dark);margin-top:0.5rem">
+            Enter Match Results
+          </h2>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="loadAdminScores()">🔄 Reload Scores</button>
+      </div>
+
+      <div class="card" style="background:var(--green-light);border:none;margin-bottom:1.5rem;font-size:0.85rem">
+        <strong>Instructions:</strong>
+        Enter the final score for each match, then click <strong>Save</strong>.
+        Click <strong>Lock</strong> before kickoff to prevent users editing that match.
+        Points are calculated automatically.
+      </div>
+
+      <div id="admin-matches"></div>
+
+    </div><!-- /admin-panel -->
+  </div>
+</div><!-- /page-admin -->
+
+
+<!-- ═══════════════════════════════════════════════════════
+     TOAST NOTIFICATION
+═══════════════════════════════════════════════════════ -->
+<div id="toast" class="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
