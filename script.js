@@ -5,7 +5,7 @@
    Google Apps Script Web App URL.
    ============================================================ */
 
-const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXi66h0kUhKgiHQzxYiJg2xupDpJk1y8a-7BqB71hVw6f24NfYpJrwE48VoRgQSxLY/exec';
 const ADMIN_PASSWORD  = 'worldcup2026admin'; // change this
 
 // ============================================================
