@@ -1,4 +1,4 @@
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwXi66h0kUhKgiHQzxYiJg2xupDpJk1y8a-7BqB71hVw6f24NfYpJrwE48VoRgQSxLY/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyJdbRq3IntXHxQk6_EKfMAFyvPNbfR3BzThwmH-EKhG8LbmIf8mKGWtDa3Pn41943l/exec';
 const ADMIN_PASSWORD  = 'worldcup2026admin'; // change this
 
 // ============================================================
@@ -123,6 +123,12 @@ let state = {
 // NAVIGATION
 // ============================================================
 function navigate(pageName) {
+  // If user tries to go to predictions without a name, send them to landing
+  if (pageName === 'predictions' && !state.userName) {
+    pageName = 'landing';
+    showToast('Enter your name first to make predictions.', '');
+  }
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.navbar-links button').forEach(b => b.classList.remove('active'));
 
@@ -136,7 +142,11 @@ function navigate(pageName) {
   window.scrollTo(0, 0);
 
   if (pageName === 'leaderboard') loadLeaderboard();
-  if (pageName === 'predictions' && state.userName) loadActualScores();
+  if (pageName === 'predictions' && state.userName) {
+    // Re-render to show any locked matches that changed, then load scores
+    renderPredictionPage();
+    loadActualScores();
+  }
 }
 
 // ============================================================
@@ -622,25 +632,98 @@ async function toggleLock(matchId) {
 
 // ============================================================
 // GOOGLE APPS SCRIPT API CALL
+// ── Uses GET requests to avoid CORS issues with Apps Script ──
 // ============================================================
 async function appsScriptCall(payload) {
   if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
-    // Demo mode: return mock success
+    // Demo mode — no URL set yet
     console.warn('⚠️  No Apps Script URL set — running in demo mode.');
-    if (payload.action === 'getLeaderboard') {
-      return { success: true, leaderboard: [] };
-    }
+    if (payload.action === 'getLeaderboard') return { success: true, leaderboard: [] };
+    if (payload.action === 'getScores')      return { success: true, scores: {} };
+    if (payload.action === 'getPredictions') return { success: true, predictions: null };
     return { success: true };
   }
 
-  const response = await fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(payload),
-  });
+  // Encode entire payload as a URL parameter (GET avoids CORS preflight issues)
+  const url = APPS_SCRIPT_URL + '?payload=' + encodeURIComponent(JSON.stringify(payload));
 
+  const response = await fetch(url, { redirect: 'follow' });
   if (!response.ok) throw new Error('HTTP ' + response.status);
-  return response.json();
+
+  const text = await response.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error('Bad response from Apps Script: ' + text.substring(0, 200));
+  }
+}
+
+// ============================================================
+// TEST CONNECTION (called from Admin page)
+// ============================================================
+async function testConnection() {
+  const btn = document.getElementById('test-conn-btn');
+  const out = document.getElementById('test-conn-result');
+  btn.disabled = true;
+  btn.textContent = 'Testing…';
+  out.style.display = 'none';
+
+  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    out.style.cssText = 'display:block;padding:0.75rem;border-radius:8px;background:#fff3cd;color:#856404;margin-top:0.75rem;font-size:0.85rem';
+    out.innerHTML = '⚠️ <strong>No URL set.</strong> Open script.js and replace <code>YOUR_APPS_SCRIPT_URL_HERE</code> with your Apps Script Web App URL.';
+    btn.disabled = false;
+    btn.textContent = '🔌 Test Connection';
+    return;
+  }
+
+  try {
+    const resp = await appsScriptCall({ action: 'ping' });
+    if (resp.success) {
+      out.style.cssText = 'display:block;padding:0.75rem;border-radius:8px;background:#d4edda;color:#155724;margin-top:0.75rem;font-size:0.85rem';
+      out.innerHTML = '✅ <strong>Connection successful!</strong> Your Apps Script is working correctly.';
+    } else {
+      throw new Error(resp.error || 'Unknown error');
+    }
+  } catch (e) {
+    out.style.cssText = 'display:block;padding:0.75rem;border-radius:8px;background:#f8d7da;color:#721c24;margin-top:0.75rem;font-size:0.85rem';
+    out.innerHTML = `❌ <strong>Connection failed.</strong><br>Error: ${e.message}<br><br>
+      <strong>Check:</strong><br>
+      1. Is the URL in script.js correct? (must end in <code>/exec</code>)<br>
+      2. Did you deploy with <em>Anyone</em> access?<br>
+      3. Did you authorise the script when prompted?`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🔌 Test Connection';
+}
+
+// Panel version of test connection (for inside admin panel)
+async function testConnectionPanel() {
+  const btn = document.getElementById('test-conn-btn-panel');
+  const out = document.getElementById('test-conn-result-panel');
+  btn.disabled = true;
+  btn.textContent = 'Testing…';
+  out.style.display = 'none';
+
+  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    out.style.cssText = 'display:block;padding:0.75rem;border-radius:8px;background:#fff3cd;color:#856404;font-size:0.85rem';
+    out.innerHTML = '⚠️ <strong>No URL set.</strong> Open script.js and replace <code>YOUR_APPS_SCRIPT_URL_HERE</code> with your Apps Script Web App URL.';
+    btn.disabled = false; btn.textContent = '🔌 Test Connection';
+    return;
+  }
+
+  try {
+    const resp = await appsScriptCall({ action: 'ping' });
+    if (resp.success) {
+      out.style.cssText = 'display:block;padding:0.75rem;border-radius:8px;background:#d4edda;color:#155724;font-size:0.85rem';
+      out.innerHTML = '✅ <strong>Connected!</strong> Apps Script is responding correctly.';
+    } else throw new Error(resp.error || 'Unknown error');
+  } catch (e) {
+    out.style.cssText = 'display:block;padding:0.75rem;border-radius:8px;background:#f8d7da;color:#721c24;font-size:0.85rem';
+    out.innerHTML = `❌ <strong>Failed:</strong> ${e.message}<br>Check URL ends in <code>/exec</code> and access is set to <em>Anyone</em>.`;
+  }
+
+  btn.disabled = false; btn.textContent = '🔌 Test Connection';
 }
 
 // ============================================================
